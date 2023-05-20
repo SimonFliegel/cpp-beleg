@@ -2,27 +2,25 @@
 #define USER_H
 
 #include <QString>
-#include <QDate>
+#include <QList>
 
-class user
+class User
 {
 private:
+    int id;
     QString name;
     QString surname;
-    QString email;
-    QDate bday;
+    QList<int> lendedMedia;
 
 public:
-    user(QString name, QString surname, QString email, QDate bday);
-
+    User(QString name, QString surname);
+    int getId();
     QString getName();
     QString getSurname();
-    QString getEmail();
-    QDate getBirthday();
+    void setId(int id);
     void setName(QString name);
     void setSurname(QString surname);
-    void setEmail(QString email);
-    void setBirthday(QDate bday);
+    bool lendMedia(int mediaId);
 };
 
 #endif // USER_H

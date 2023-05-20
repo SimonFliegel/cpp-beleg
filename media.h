@@ -6,11 +6,14 @@
 class Media
 {
 private:
+    int id;
     QString title;
-    //type?
-
 public:
     Media(QString title);
+    QString getTitle();
+    int getId();
+    void setTitle(QString title);
+    void setId(int id);
 };
 
 #endif // MEDIA_H

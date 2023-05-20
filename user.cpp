@@ -1,44 +1,35 @@
 #include "user.h"
+#include "administration.h"
 
-user::user(QString name, QString surname, QString email, QDate bday)
-{
+User::User(QString name, QString surname) {
     this->name = name;
     this->surname = surname;
-    this->email = email; // validate
-    this->bday = bday;
 }
 
-QString user::getName() {
+int User::getId() {
+    return id;
+}
+
+QString User::getName() {
     return this->name;
 }
 
-QString user::getSurname() {
+QString User::getSurname() {
     return this->surname;
 }
 
-QString user::getEmail() {
-    return this->email;
+void User::setId(int id) {
+    this->id = id;
 }
 
-QDate user::getBirthday() {
-    return this->bday;
-}
-
-void user::setName(QString name) {
+void User::setName(QString name) {
     this->name = name;
 }
 
-void user::setSurname(QString surname) {
+void User::setSurname(QString surname) {
     this->surname = surname;
 }
 
-void user::setEmail(QString email) {
-    // validate
-    this->email = email;
+bool lendMedia(int mediaId) {
+    if (media)
 }
-
-void user::setBirthday(QDate bday) {
-    this->bday = bday;
-}
-
-
