@@ -1,6 +1,6 @@
 #include "cd.h"
 
-Cd::Cd(QString title, QString interpret) : Media(title)
+Cd::Cd(QString title, QString interpret) : Media(title, CD)
 {
     this->interpret = interpret;
 }

@@ -7,20 +7,19 @@
 class User
 {
 private:
-    int id;
     QString name;
     QString surname;
-    QList<int> lendedMedia;
+    QList<int> lentMedia;
 
 public:
     User(QString name, QString surname);
-    int getId();
     QString getName();
     QString getSurname();
-    void setId(int id);
+    QList<int> getLentMedia();
     void setName(QString name);
     void setSurname(QString surname);
-    bool lendMedia(int mediaId);
+    bool lendMediaByUser(int mediaId);
+    bool handBackMediaByUser(int mediaId); //TODO
 };
 
 #endif // USER_H

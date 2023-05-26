@@ -2,18 +2,22 @@
 #define MEDIA_H
 
 #include <QString>
+#include "mediaTypes.h"
 
 class Media
 {
 private:
-    int id;
     QString title;
+    bool isAvailable;
+    MediaType type = CUSTOM;
 public:
-    Media(QString title);
+    Media(QString title, MediaType type = CUSTOM);
     QString getTitle();
-    int getId();
+    MediaType getType();
+    bool getAvailability();
     void setTitle(QString title);
-    void setId(int id);
+    void setAvailability(bool isAvailable);
+    void changeAvailability();
 };
 
 #endif // MEDIA_H

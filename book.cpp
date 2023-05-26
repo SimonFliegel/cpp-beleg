@@ -1,6 +1,6 @@
 #include "book.h"
 
-Book::Book(QString title, QString author) : Media(title)
+Book::Book(QString title, QString author) : Media(title, BOOK)
 {
     this->author = author;
 }

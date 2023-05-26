@@ -24,6 +24,7 @@ HEADERS += \
     cd.h \
     dvd.h \
     media.h \
+    mediaTypes.h \
     medienverwaltung.h \
     user.h
 

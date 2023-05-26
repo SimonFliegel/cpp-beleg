@@ -1,25 +1,22 @@
+#include <QDebug>
+
 #include "user.h"
-#include "administration.h"
 
 User::User(QString name, QString surname) {
     this->name = name;
     this->surname = surname;
 }
 
-int User::getId() {
-    return id;
-}
-
 QString User::getName() {
-    return this->name;
+    return name;
 }
 
 QString User::getSurname() {
-    return this->surname;
+    return surname;
 }
 
-void User::setId(int id) {
-    this->id = id;
+QList<int> User::getLentMedia() {
+    return lentMedia;
 }
 
 void User::setName(QString name) {
@@ -30,6 +27,19 @@ void User::setSurname(QString surname) {
     this->surname = surname;
 }
 
-bool lendMedia(int mediaId) {
-    if (media)
+bool User::lendMediaByUser(int mediaId) {
+    if (lentMedia.contains(mediaId)) {
+        qDebug() << "mediaID: " << mediaId << " already in lentMedia-List";
+        return false;
+    }
+    lentMedia.append(mediaId);
+    return true;
+}
+
+bool User::handBackMediaByUser(int mediaId) {
+    if (!lentMedia.contains(mediaId)) {
+        qDebug() << "mediaID: " << mediaId << " not in lentMedia-List";
+        return false;
+    }
+    return lentMedia.removeOne(mediaId);
 }

@@ -8,8 +8,9 @@ class Dvd : public Media
 private:
     QString director = "";
 public:
-    Dvd(QString title);
     Dvd(QString title, QString director);
+    QString getDirector();
+    void setDirector(QString director);
 };
 
 #endif // DVD_H
