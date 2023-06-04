@@ -16,7 +16,9 @@ private:
     QMap<int,Media*> mediaList;
     int nextUserId = 0;
     int nextMediaId = 0;
-    bool checkDataForCorruption();
+    int returnAllMediaByUser(int userId);
+    int getItemCountFromFile(QString path);
+
 public:
     Administration() {};
     void registerUser(User* user);
@@ -24,9 +26,13 @@ public:
     bool deleteUser(int userId);
     bool deleteMedia(int mediaId);
     Media* getMedia(int mediaId);
+    QMap<int,Media*>& getMediaList();
     User* getUser(int userId);
+    QMap<int,User*>& getUserList();
+    int getMediaCount();
+    int getUserCount();
     bool lendMedia(int mediaId, int userId);
-    bool handBackMedia(int mediaId, int userId);
+    bool returnMedia(int mediaId, int userId);
     bool saveUsers();
     bool saveMedia();
     bool loadUsers();
@@ -34,6 +40,8 @@ public:
     void clearUsers();
     void clearMedia();
     bool clearFiles();
+    int getMediaCountFromFile();
+    int getUserCountFromFile();
 };
 
 #endif // USERADMINISTRATION_H

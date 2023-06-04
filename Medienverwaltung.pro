@@ -15,6 +15,7 @@ SOURCES += \
     dvd.cpp \
     main.cpp \
     media.cpp \
+    mediaTypes.cpp \
     medienverwaltung.cpp \
     user.cpp
 

@@ -15,7 +15,7 @@ public:
     User(QString name, QString surname);
     QString getName();
     QString getSurname();
-    QList<int> getLentMedia();
+    QList<int>& getLentMedia();
     void setName(QString name);
     void setSurname(QString surname);
     bool lendMediaByUser(int mediaId);

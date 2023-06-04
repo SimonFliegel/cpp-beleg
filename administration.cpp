@@ -17,17 +17,24 @@ void Administration::addMedia(Media* media) {
 }
 
 bool Administration::deleteUser(int userId) {
-    if (userList.remove(userId)) {
-        return true;
+    if (!userList.contains(userId)) {
+        return false;
     }
-    return false;
+    returnAllMediaByUser(userId);
+    delete userList.value(userId);
+    userList.remove(userId);
+    return true;
 }
 
 bool Administration::deleteMedia(int mediaId) {
-    if (mediaList.remove(mediaId)) {
-        return true;
+    if (!mediaList.contains(mediaId)) {
+        return false;
     }
-    return false;
+    int userId = mediaList.value(mediaId)->getUserId();
+    userList.value(userId)->handBackMediaByUser(mediaId);
+    delete mediaList.value(mediaId);
+    mediaList.remove(mediaId);
+    return true;
 }
 
 Media* Administration::getMedia(int mediaId) {
@@ -38,10 +45,26 @@ User* Administration::getUser(int userId) {
     return userList.value(userId);
 }
 
+QMap<int,Media*>& Administration::getMediaList() {
+    return mediaList;
+}
+
+QMap<int,User*>& Administration::getUserList() {
+    return userList;
+}
+
+int Administration::getMediaCount() {
+    return mediaList.count();
+}
+
+int Administration::getUserCount() {
+    return userList.count();
+}
+
 bool Administration::lendMedia(int mediaId, int userId) {
     if (mediaList.contains(mediaId) && userList.contains(userId)) {
-        User* user = userList.value(userId);
-        if (user->lendMediaByUser(mediaId)) {
+        if (userList.value(userId)->lendMediaByUser(mediaId)) {
+            mediaList.value(mediaId)->setUserId(userId);
             return true;
         }
     }
@@ -49,13 +72,15 @@ bool Administration::lendMedia(int mediaId, int userId) {
     return false;
 }
 
-bool Administration::handBackMedia(int mediaId, int userId) {
+bool Administration::returnMedia(int mediaId, int userId) {
     if (mediaList.contains(mediaId) && userList.contains(userId)) {
         User* user = userList.value(userId);
         Media* media = mediaList.value(mediaId);
-        if (!media->getAvailability()) {
-            media->changeAvailability();
-            return user->handBackMediaByUser(mediaId);
+        if (media->getUserId() != -1) {
+            if (user->handBackMediaByUser(mediaId)) {
+                media->setUserId(-1);
+                return true;
+            }
         } else {
             qDebug() << "corrupted data: media not lent";
         }
@@ -72,11 +97,10 @@ bool Administration::saveUsers() {
     QTextStream stream(&file);
     QString lentMediaString = "";
     QMap<int,User*>::const_iterator it_userList;
-    QList<int>::const_iterator it_lentMedia;
     for (it_userList = userList.constBegin(); it_userList != userList.constEnd(); ++it_userList) {
         User* user = it_userList.value();
-        for (it_lentMedia = user->getLentMedia().constBegin(); it_lentMedia != user->getLentMedia().constEnd(); ++it_lentMedia) {
-            lentMediaString += QString::number(*it_lentMedia) +  " ";
+        for (int lentMediaId : user->getLentMedia()) {
+            lentMediaString += QString::number(lentMediaId) +  " ";
         }
         qDebug() << "lentMediaString: " << lentMediaString; // test output
         // id,name,surname,lentMediaIds
@@ -96,8 +120,8 @@ bool Administration::saveMedia() {
     QMap<int,Media*>::const_iterator it_mediaList;
     for (it_mediaList = mediaList.constBegin(); it_mediaList != mediaList.constEnd(); ++it_mediaList) {
         Media* media = it_mediaList.value();
-        // id,title,availability[0,1],type[0..3],author/interpret/director/-1
-        stream << it_mediaList.key() << "," << media->getTitle() << "," << (media->getAvailability() ? 0 : 1) << "," << media->getType() << ",";
+        // id,title,userId,type[0..3],author/interpret/director/-1
+        stream << it_mediaList.key() << "," << media->getTitle() << "," << media->getUserId() << "," << media->getType() << ",";
         switch(media->getType()) {
         case BOOK:
             stream << static_cast<Book*>(media)->getAuthor();
@@ -148,11 +172,10 @@ bool Administration::loadUsers() {
 }
 
 bool Administration::loadMedia() {
-    int mediaId;
+    int mediaId, userId;
     QString title;
     MediaType type;
-    bool isAvailable;
-    QString specialAttr;
+    QString creator;
     QFile file(mediaFilePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "Failed to open media.csv for reading";
@@ -165,57 +188,98 @@ bool Administration::loadMedia() {
         QStringList values = dataLine.split(',');
         mediaId = values[0].toInt();
         title = values[1];
-        isAvailable = values[2].toInt();
+        userId = values[2].toInt();
         type = (MediaType)values[3].toInt();
-        specialAttr = values[4];
-        Media media(title, type);
-        media.setAvailability(isAvailable);
+        creator = values[4];
+        Media* media;
+
         switch (type) {
         case BOOK:
-            static_cast<Book*>(&media)->setAuthor(specialAttr);
+            media = new Book(title, creator);
             break;
         case CD:
-            static_cast<Cd*>(&media)->setInterpret(specialAttr);
+            media = new Cd(title, creator);
             break;
         case DVD:
-            static_cast<Dvd*>(&media)->setDirector(specialAttr);
+            media = new Dvd(title, creator);
             break;
         default: //CUSTOM
+            media = new Media(title);
             break;
         }
-        mediaList.insert(mediaId, &media);
+        media->setUserId(userId);
+        mediaList.insert(mediaId, media);
         nextMediaId = mediaId + 1;
     }
     return true;
 }
 
 void Administration::clearUsers() {
-    qDebug() << "Clearing all users!";
+    for (User* user : std::as_const(userList)) delete user;
     qDeleteAll(userList.begin(), userList.end());
     userList.clear();
+    qDebug() << "Cleared all users!";
 }
 
 void Administration::clearMedia() {
-    qDebug() << "Clearing all media!";
+    for (Media* media : std::as_const(mediaList)) delete media;
     qDeleteAll(mediaList.begin(), mediaList.end());
     mediaList.clear();
+    qDebug() << "Cleared all media!";
 }
 
 bool Administration::clearFiles() {
-    qDebug() << "Deleting files containing data!";
     if (!QFile::remove(userFilePath)) {
         return false;
     }
     if (!QFile::remove(mediaFilePath)) {
         return false;
     }
+    qDebug() << "Deleted files containing data!";
     return true;
 }
 
-bool checkDataForCorruption() {
-    // @TODO
-    return true;
+int Administration::returnAllMediaByUser(int userId) {
+    if (!userList.contains(userId)) {
+        qDebug() << "Error user with Id: " << userId << "doesn't exist";
+        return -1;
+    }
+    User* user = userList.value(userId);
+    int counter = user->getLentMedia().length();
+    for (int mediaId : user->getLentMedia()) {
+        mediaList.value(mediaId)->setUserId(-1);
+    }
+    user->getLentMedia().clear();
+    return counter;
 }
 
+int Administration::getItemCountFromFile(QString path) {
+    int itemCount = 0;
+    if (!QFile::exists(path)) {
+        qDebug() << path << " doesn't exist yet";
+        return -1;
+    }
+
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Failed to open " << path;
+        return -2;
+    }
+
+    QTextStream stream(&file);
+    while (!stream.atEnd()) {
+        itemCount++;
+    }
+
+    return itemCount;
+}
+
+int Administration::getMediaCountFromFile() {
+    return getItemCountFromFile(mediaFilePath);
+}
+
+int Administration::getUserCountFromFile() {
+    return getItemCountFromFile(userFilePath);
+}
 
 

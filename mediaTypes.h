@@ -3,4 +3,6 @@
 
 enum MediaType { BOOK, CD, DVD, CUSTOM };
 
+extern const char* typeNames[4];
+
 #endif // MEDIATYPES_H

@@ -8,16 +8,15 @@ class Media
 {
 private:
     QString title;
-    bool isAvailable;
+    int userId;
     MediaType type = CUSTOM;
 public:
     Media(QString title, MediaType type = CUSTOM);
     QString getTitle();
     MediaType getType();
-    bool getAvailability();
+    int getUserId();
     void setTitle(QString title);
-    void setAvailability(bool isAvailable);
-    void changeAvailability();
+    void setUserId(int userId);
 };
 
 #endif // MEDIA_H

@@ -15,7 +15,7 @@ QString User::getSurname() {
     return surname;
 }
 
-QList<int> User::getLentMedia() {
+QList<int>& User::getLentMedia() {
     return lentMedia;
 }
 
