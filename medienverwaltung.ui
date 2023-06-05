@@ -18,7 +18,7 @@
     <item row="1" column="0">
      <widget class="QTabWidget" name="tab_view">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_media">
        <attribute name="title">
@@ -222,9 +222,9 @@
         <widget class="QComboBox" name="cB_lendMedia_user">
          <property name="geometry">
           <rect>
-           <x>280</x>
+           <x>10</x>
            <y>30</y>
-           <width>271</width>
+           <width>261</width>
            <height>25</height>
           </rect>
          </property>
@@ -232,9 +232,9 @@
         <widget class="QComboBox" name="cB_lendMedia_media">
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>280</x>
            <y>30</y>
-           <width>261</width>
+           <width>271</width>
            <height>25</height>
           </rect>
          </property>
@@ -410,7 +410,7 @@
           </rect>
          </property>
          <property name="text">
-          <string>registrieren</string>
+          <string>Registrieren</string>
          </property>
         </widget>
        </widget>
@@ -449,7 +449,7 @@
           </rect>
          </property>
          <property name="text">
-          <string>zurückgeben</string>
+          <string>Zurückgeben</string>
          </property>
         </widget>
        </widget>

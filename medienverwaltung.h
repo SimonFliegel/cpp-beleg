@@ -18,7 +18,7 @@ public:
 
 private:
     Ui::Medienverwaltung *ui;
-    Administration admin;
+    Administration* admin = new Administration();
 
     void initUi();
     void initMediaTable();
@@ -27,17 +27,20 @@ private:
     void initMessageBoxInformation(QString msg);
     int initMessageBoxQuestion(QString question, QString descr = "");
 
-    void loadData();
     void saveData();
+    void loadData();
     void updateMediaUI();
     void updateUserUI();
     void updateMediaTable();
     void updateUserTable();
-    void updateCBLendSelections();
-    void updateCBReturnUserSelections();
-    void updateCBReturnMediaSelections(int userId);
+    void updateAllUsersSelection();
+    void updateLendingSelection();
+    void updateLentMediaList();
+    void updateReturnableMediaSelection(int userId);
 
 private slots:
+    void actionSave_Triggered();
+    void actionLoad_Triggered();
     void btn_addMedia_Clicked();
     void btn_registerUser_Clicked();
     void btn_lendMedia_Clicked();

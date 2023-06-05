@@ -61,6 +61,7 @@ int Administration::getUserCount() {
     return userList.count();
 }
 
+
 bool Administration::lendMedia(int mediaId, int userId) {
     if (mediaList.contains(mediaId) && userList.contains(userId)) {
         if (userList.value(userId)->lendMediaByUser(mediaId)) {
@@ -94,15 +95,17 @@ bool Administration::saveUsers() {
         qDebug() << "Failed to open user.csv for writing";
         return false;
     }
+
     QTextStream stream(&file);
     QString lentMediaString = "";
     QMap<int,User*>::const_iterator it_userList;
+
     for (it_userList = userList.constBegin(); it_userList != userList.constEnd(); ++it_userList) {
         User* user = it_userList.value();
+        lentMediaString.clear();
         for (int lentMediaId : user->getLentMedia()) {
             lentMediaString += QString::number(lentMediaId) +  " ";
         }
-        qDebug() << "lentMediaString: " << lentMediaString; // test output
         // id,name,surname,lentMediaIds
         stream << it_userList.key() << "," << user->getName() << "," << user->getSurname() << "," << lentMediaString << Qt::endl;
     }
@@ -112,25 +115,32 @@ bool Administration::saveUsers() {
 
 bool Administration::saveMedia() {
     QFile file(mediaFilePath);
+
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qDebug() << "Failed to open media.csv for writing";
         return false;
     }
+
     QTextStream stream(&file);
     QMap<int,Media*>::const_iterator it_mediaList;
+    QString creator = "";
+
     for (it_mediaList = mediaList.constBegin(); it_mediaList != mediaList.constEnd(); ++it_mediaList) {
         Media* media = it_mediaList.value();
         // id,title,userId,type[0..3],author/interpret/director/-1
         stream << it_mediaList.key() << "," << media->getTitle() << "," << media->getUserId() << "," << media->getType() << ",";
         switch(media->getType()) {
         case BOOK:
-            stream << static_cast<Book*>(media)->getAuthor();
+            creator = static_cast<Book*>(media)->getAuthor();
+            stream << (creator.length() > 0 ? creator : "-1");
             break;
         case CD:
-            stream << static_cast<Cd*>(media)->getInterpret();
+            creator = static_cast<Cd*>(media)->getInterpret();
+            stream << (creator.length() > 0 ? creator : "-1");
             break;
         case DVD:
-            stream << static_cast<Dvd*>(media)->getDirector();
+            creator = static_cast<Dvd*>(media)->getDirector();
+            stream << (creator.length() > 0 ? creator : "-1");
             break;
         default: // CUSTOM
             stream << QString::number(-1);
@@ -143,29 +153,33 @@ bool Administration::saveMedia() {
 }
 
 bool Administration::loadUsers() {
+    User* user;
     int mediaId;
     int userId;
     QString name, surname;
     QFile file(userFilePath);
+
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "Failed to open user.csv for reading";
         return false;
     }
+
     clearUsers();
     QTextStream stream(&file);
+
     while (!stream.atEnd()) {
         QString dataLine = stream.readLine();
         QStringList values = dataLine.split(',');
         userId = values[0].toInt();
         name = values[1];
         surname = values[2];
-        User user(name, surname);
+        user = new User(name, surname);
         QStringList lentMediaIds = values[3].split(" ");
-        foreach (const QString& str, lentMediaIds) {
+        for (const QString& str : lentMediaIds) {
             mediaId = str.toInt();
-            user.lendMediaByUser(mediaId);
+            user->lendMediaByUser(mediaId);
         }
-        userList.insert(userId, &user);
+        userList.insert(userId, user);
         nextUserId = userId + 1;
     }
     return true;
@@ -177,12 +191,15 @@ bool Administration::loadMedia() {
     MediaType type;
     QString creator;
     QFile file(mediaFilePath);
+
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "Failed to open media.csv for reading";
         return false;
     }
+
     clearMedia();
     QTextStream stream(&file);
+
     while (!stream.atEnd()) {
         QString dataLine = stream.readLine();
         QStringList values = dataLine.split(',');
@@ -244,8 +261,10 @@ int Administration::returnAllMediaByUser(int userId) {
         qDebug() << "Error user with Id: " << userId << "doesn't exist";
         return -1;
     }
+
     User* user = userList.value(userId);
     int counter = user->getLentMedia().length();
+
     for (int mediaId : user->getLentMedia()) {
         mediaList.value(mediaId)->setUserId(-1);
     }
