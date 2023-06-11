@@ -8,6 +8,7 @@ class Cd : public Media
 private:
     QString interpret = "";
 public:
+    Cd(QString title);
     Cd(QString title, QString interpret);
     QString getInterpret();
     void setInterpret(QString);

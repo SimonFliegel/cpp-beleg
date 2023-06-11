@@ -19,7 +19,7 @@ public:
     void setName(QString name);
     void setSurname(QString surname);
     bool lendMediaByUser(int mediaId);
-    bool handBackMediaByUser(int mediaId); //TODO
+    bool handBackMediaByUser(int mediaId);
 };
 
 #endif // USER_H

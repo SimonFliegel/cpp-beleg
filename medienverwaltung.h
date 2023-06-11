@@ -2,6 +2,7 @@
 #define MEDIENVERWALTUNG_H
 
 #include <QMainWindow>
+#include <QTableWidget>
 #include "administration.h"
 
 QT_BEGIN_NAMESPACE
@@ -24,11 +25,13 @@ private:
     void initMediaTable();
     void initUserTable();
     void initGBaddMedia();
-    void initMessageBoxInformation(QString msg);
-    int initMessageBoxQuestion(QString question, QString descr = "");
 
     void saveData();
     void loadData();
+
+    void fillMediaTable(QMap<int,Media*> mediaData);
+    void fillUserTable(QMap<int,User*> userData);
+
     void updateMediaUI();
     void updateUserUI();
     void updateMediaTable();
@@ -43,11 +46,16 @@ private slots:
     void actionLoad_Triggered();
     void btn_addMedia_Clicked();
     void btn_registerUser_Clicked();
+    void btn_deleteMedia_Clicked();
+    void btn_deleteUser_Clicked();
     void btn_lendMedia_Clicked();
     void btn_returnMedia_Clicked();
     void btn_returnMedia_user_Clicked();
+    void db_media_ItemChanged(QTableWidgetItem* item);
+    void db_user_ItemChanged(QTableWidgetItem* item);
+    void cB_mediaType_SelectionChanged();
     void cB_returnMedia_user_SelectionChanged();
     void db_user_SelectionChanged();
-    void tab_view_CurrentChanged();
+    void tab_view_CurrentChanged(int index);
 };
 #endif // MEDIENVERWALTUNG_H

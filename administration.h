@@ -23,12 +23,18 @@ public:
     Administration() {};
     void registerUser(User* user);
     void addMedia(Media* media);
+    void updateMediaType(int mediaId, MediaType newType);
     bool deleteUser(int userId);
     bool deleteMedia(int mediaId);
     Media* getMedia(int mediaId);
     QMap<int,Media*>& getMediaList();
+    QMap<int,Media*>& sortMediaListByType();
+    QMap<int,Media*>& sortMediaListByTitle();
+    QMap<int,Media*>& sortMediaListByCreator();
     User* getUser(int userId);
     QMap<int,User*>& getUserList();
+    QMap<int,User*>& sortUserBySurname();
+    QMap<int,User*>& sortUserByName();
     int getMediaCount();
     int getUserCount();
     bool lendMedia(int mediaId, int userId);

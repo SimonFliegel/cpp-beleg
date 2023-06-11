@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
+#include <algorithm>
 #include "administration.h"
 #include "book.h"
 #include "cd.h"
@@ -16,6 +17,33 @@ void Administration::addMedia(Media* media) {
     nextMediaId++;
 }
 
+void Administration::updateMediaType(int mediaId, MediaType newType) {
+    if (!mediaList.contains(mediaId)) {
+        qDebug() << "mediaId: " << mediaId << " not in List";
+        return;
+    }
+    Media* oldMedia = getMedia(mediaId);
+    Media* updatedMedia;
+
+    switch (newType) {
+    case BOOK:
+        updatedMedia = new Book(oldMedia->getTitle());
+        break;
+    case CD:
+        updatedMedia = new Cd(oldMedia->getTitle());
+        break;
+    case DVD:
+        updatedMedia = new Dvd(oldMedia->getTitle());
+        break;
+    default:
+        updatedMedia = oldMedia;
+        break;
+    }
+
+    delete oldMedia;
+    mediaList.insert(mediaId, updatedMedia);
+}
+
 bool Administration::deleteUser(int userId) {
     if (!userList.contains(userId)) {
         return false;
@@ -27,11 +55,14 @@ bool Administration::deleteUser(int userId) {
 }
 
 bool Administration::deleteMedia(int mediaId) {
+    Media* media;
     if (!mediaList.contains(mediaId)) {
         return false;
     }
-    int userId = mediaList.value(mediaId)->getUserId();
-    userList.value(userId)->handBackMediaByUser(mediaId);
+    media = mediaList.value(mediaId);
+    if (media->getUserId() != -1) {
+        return false;
+    }
     delete mediaList.value(mediaId);
     mediaList.remove(mediaId);
     return true;
@@ -49,8 +80,30 @@ QMap<int,Media*>& Administration::getMediaList() {
     return mediaList;
 }
 
+QMap<int,Media*>& Administration::sortMediaListByType() {
+    QMap<int,Media*> sortedList;
+
+    // std::map<int,Media*> stdMap = sortedList.toStdMap();
+}
+
+QMap<int,Media*>& Administration::sortMediaListByTitle() {
+
+}
+
+QMap<int,Media*>& Administration::sortMediaListByCreator() {
+
+}
+
 QMap<int,User*>& Administration::getUserList() {
     return userList;
+}
+
+QMap<int,User*>& Administration::sortUserBySurname() {
+
+}
+
+QMap<int,User*>& Administration::sortUserByName() {
+
 }
 
 int Administration::getMediaCount() {
@@ -97,16 +150,21 @@ bool Administration::saveUsers() {
     }
 
     QTextStream stream(&file);
-    QString lentMediaString = "";
+    QString lentMediaString;
     QMap<int,User*>::const_iterator it_userList;
 
     for (it_userList = userList.constBegin(); it_userList != userList.constEnd(); ++it_userList) {
         User* user = it_userList.value();
-        lentMediaString.clear();
-        for (int lentMediaId : user->getLentMedia()) {
-            lentMediaString += QString::number(lentMediaId) +  " ";
+        lentMediaString = "";
+        if (user->getLentMedia().isEmpty()) {
+            lentMediaString = "-1";
+        } else {
+            for (int lentMediaId : user->getLentMedia()) {
+                lentMediaString += QString::number(lentMediaId) +  " ";
+            }
         }
-        // id,name,surname,lentMediaIds
+
+        // id,name,surname,lentMediaIds/-1
         stream << it_userList.key() << "," << user->getName() << "," << user->getSurname() << "," << lentMediaString << Qt::endl;
     }
     file.close();
@@ -176,8 +234,12 @@ bool Administration::loadUsers() {
         user = new User(name, surname);
         QStringList lentMediaIds = values[3].split(" ");
         for (const QString& str : lentMediaIds) {
-            mediaId = str.toInt();
-            user->lendMediaByUser(mediaId);
+            if (str.length() > 0) {
+                mediaId = str.toInt();
+                if (mediaId != -1) {
+                    user->lendMediaByUser(mediaId);
+                }
+            }
         }
         userList.insert(userId, user);
         nextUserId = userId + 1;
@@ -232,17 +294,13 @@ bool Administration::loadMedia() {
 }
 
 void Administration::clearUsers() {
-    for (User* user : std::as_const(userList)) delete user;
     qDeleteAll(userList.begin(), userList.end());
     userList.clear();
-    qDebug() << "Cleared all users!";
 }
 
 void Administration::clearMedia() {
-    for (Media* media : std::as_const(mediaList)) delete media;
-    qDeleteAll(mediaList.begin(), mediaList.end());
+    qDeleteAll(mediaList);
     mediaList.clear();
-    qDebug() << "Cleared all media!";
 }
 
 bool Administration::clearFiles() {
@@ -287,6 +345,7 @@ int Administration::getItemCountFromFile(QString path) {
 
     QTextStream stream(&file);
     while (!stream.atEnd()) {
+        stream.readLine();
         itemCount++;
     }
 

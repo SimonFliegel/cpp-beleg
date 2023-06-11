@@ -1,5 +1,7 @@
 #include "dvd.h"
 
+Dvd::Dvd(QString title) : Media(title, DVD) {}
+
 Dvd::Dvd(QString title, QString director) : Media(title, DVD)
 {
     this->director = director;
