@@ -39,6 +39,7 @@ void Medienverwaltung::initUi() {
     connect(ui->btn_lendMedia, SIGNAL(released()), this, SLOT(btn_lendMedia_Clicked()));
     connect(ui->btn_returnMedia, SIGNAL(released()), this, SLOT(btn_returnMedia_Clicked()));
     connect(ui->btn_returnMedia_user, SIGNAL(released()), this, SLOT(btn_returnMedia_user_Clicked()));
+    connect(ui->db_media->horizontalHeader(), &QHeaderView::sectionClicked, this, &Medienverwaltung::db_media_columnHeader_Clicked);
     connect(ui->db_media, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(db_media_ItemChanged(QTableWidgetItem*)));
     connect(ui->db_user, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(db_user_ItemChanged(QTableWidgetItem*)));
     connect(ui->cB_returnMedia_user, SIGNAL(currentIndexChanged(int)), this, SLOT(cB_returnMedia_user_SelectionChanged()));
@@ -155,6 +156,7 @@ void Medienverwaltung::fillMediaTable(QMap<int,Media*> mediaData) {
         cB_type->setObjectName(QString("cB_mediaType_%1").arg(rowCount));
         cB_type->addItems(cB_items);
         cB_type->setCurrentIndex(it.value()->getType());
+        connect(cB_type, SIGNAL(currentIndexChanged(int)), this, SLOT(cB_mediaType_SelectionChanged()));
 
         title = new QTableWidgetItem(it.value()->getTitle());
 
@@ -425,6 +427,7 @@ void Medienverwaltung::btn_lendMedia_Clicked() {
     int userId = ui->cB_lendMedia_user->currentData().toInt();
     admin->lendMedia(mediaId, userId);
     updateMediaUI();
+    updateUserTable(); // update delete-button-status
 }
 
 void Medienverwaltung::btn_returnMedia_Clicked() {
@@ -434,6 +437,7 @@ void Medienverwaltung::btn_returnMedia_Clicked() {
         qDebug() << "returning media failed";
     }
     updateMediaUI();
+    updateUserTable();
 }
 
 void Medienverwaltung::btn_returnMedia_user_Clicked() {
@@ -450,7 +454,41 @@ void Medienverwaltung::btn_returnMedia_user_Clicked() {
         }
     }
     updateMediaUI();
+    updateUserTable();
     updateLentMediaList();
+}
+
+void Medienverwaltung::db_media_columnHeader_Clicked(int colIndex) {
+    QMap<int,Media*> sortedMedia;
+
+    switch (colIndex) {
+    case 1: // type
+        admin->sortMediaListByType(sortedMedia);
+        break;
+    case 2: // title
+        break;
+    case 3: // creator
+        break;
+    case 4: // surname
+        break;
+    case 5: // name
+        break;
+    }
+
+    fillMediaTable(sortedMedia);
+}
+
+void Medienverwaltung::db_user_columnHeader_Clicked(int colIndex) {
+    QMap<int,User*> sortedUsers;
+
+    switch (colIndex) {
+    case 1: // surname
+        break;
+    case 2: // name
+        break;
+    }
+
+    fillUserTable(sortedUsers);
 }
 
 void Medienverwaltung::db_media_ItemChanged(QTableWidgetItem* item) {

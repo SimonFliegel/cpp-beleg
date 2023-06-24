@@ -2,6 +2,9 @@
 #include <QFile>
 #include <QTextStream>
 #include <algorithm>
+
+using namespace std;
+
 #include "administration.h"
 #include "book.h"
 #include "cd.h"
@@ -80,30 +83,68 @@ QMap<int,Media*>& Administration::getMediaList() {
     return mediaList;
 }
 
-QMap<int,Media*>& Administration::sortMediaListByType() {
-    QMap<int,Media*> sortedList;
+vector<pair<int,Media*>> Administration::mediaListToStdVector() {
+    vector<pair<int,Media*>> stdVec;
+    QMap<int,Media*>::const_iterator it;
 
-    // std::map<int,Media*> stdMap = sortedList.toStdMap();
+    for (it = mediaList.constBegin(); it != mediaList.constEnd(); ++it) {
+        stdVec.push_back(make_pair(it.key(), it.value()));
+    }
+
+    return stdVec;
 }
 
-QMap<int,Media*>& Administration::sortMediaListByTitle() {
+void Administration::fillMediaListByVector(std::vector<std::pair<int,Media*>>& mediaVec) {
+    clearMedia();
 
+    for (const auto& pair : mediaVec) {
+        mediaList.insert(pair.first, pair.second);
+    }
 }
 
-QMap<int,Media*>& Administration::sortMediaListByCreator() {
+void Administration::sortMediaListByType() {
+    auto mediaVec = mediaListToStdVector();
 
+    sort(mediaVec.begin(), mediaVec.end(),
+              [](const pair<int,Media*>& m1, const pair<int,Media*>& m2) {
+        return m1.second->getType() <= m2.second->getType();
+    });
+
+    fillMediaListByVector(mediaVec);
 }
 
-QMap<int,User*>& Administration::getUserList() {
+void Administration::sortMediaListByTitle() {
+    auto mediaVec = mediaListToStdVector();
+
+    sort(mediaVec.begin(), mediaVec.end(),
+         [](const pair<int,Media*>& m1, const pair<int,Media*>& m2) {
+        return QString::compare(m1.second->getTitle(), m2.second->getTitle()) > 0 ? true : false;
+    });
+
+    fillMediaListByVector(mediaVec);
+}
+
+bool Administration::compareMediaByCreator(Media* m1, Media* m2) {
+    // TODO
+    return true;
+}
+
+void Administration::sortMediaListByCreator() {
+    auto mediaVec = mediaListToStdVector();
+
+    sort(mediaVec.begin(), mediaVec.end(), compareMediaByCreator);
+}
+
+void Administration::getUserList() {
     return userList;
 }
 
-QMap<int,User*>& Administration::sortUserBySurname() {
-
+void Administration::sortUserBySurname() {
+    return sortedList;
 }
 
 QMap<int,User*>& Administration::sortUserByName() {
-
+    return sortedList;
 }
 
 int Administration::getMediaCount() {

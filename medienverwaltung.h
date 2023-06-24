@@ -51,6 +51,8 @@ private slots:
     void btn_lendMedia_Clicked();
     void btn_returnMedia_Clicked();
     void btn_returnMedia_user_Clicked();
+    void db_media_columnHeader_Clicked(int colIndex);
+    void db_user_columnHeader_Clicked(int colIndex);
     void db_media_ItemChanged(QTableWidgetItem* item);
     void db_user_ItemChanged(QTableWidgetItem* item);
     void cB_mediaType_SelectionChanged();
