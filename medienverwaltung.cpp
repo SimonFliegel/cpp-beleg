@@ -459,15 +459,12 @@ void Medienverwaltung::btn_returnMedia_user_Clicked() {
 }
 
 void Medienverwaltung::db_media_columnHeader_Clicked(int colIndex) {
-    QMap<int,Media*> sortedMedia;
-
     switch (colIndex) {
     case 1: // type
-        admin->sortMediaListByType(sortedMedia);
+        admin->sortMediaListByType();
         break;
     case 2: // title
-        break;
-    case 3: // creator
+        admin->sortMediaListByTitle();
         break;
     case 4: // surname
         break;
@@ -475,7 +472,7 @@ void Medienverwaltung::db_media_columnHeader_Clicked(int colIndex) {
         break;
     }
 
-    fillMediaTable(sortedMedia);
+    fillMediaTable(admin->getMediaList());
 }
 
 void Medienverwaltung::db_user_columnHeader_Clicked(int colIndex) {

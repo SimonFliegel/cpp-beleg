@@ -124,27 +124,16 @@ void Administration::sortMediaListByTitle() {
     fillMediaListByVector(mediaVec);
 }
 
-bool Administration::compareMediaByCreator(Media* m1, Media* m2) {
-    // TODO
-    return true;
-}
-
-void Administration::sortMediaListByCreator() {
-    auto mediaVec = mediaListToStdVector();
-
-    sort(mediaVec.begin(), mediaVec.end(), compareMediaByCreator);
-}
-
-void Administration::getUserList() {
+QMap<int,User*>& Administration::getUserList() {
     return userList;
 }
 
-void Administration::sortUserBySurname() {
-    return sortedList;
+void Administration::sortUserListBySurname() {
+    return;
 }
 
-QMap<int,User*>& Administration::sortUserByName() {
-    return sortedList;
+void Administration::sortUserListByName() {
+    return;
 }
 
 int Administration::getMediaCount() {

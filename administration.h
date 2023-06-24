@@ -22,7 +22,8 @@ private:
     std::vector<std::pair<int,User*>> userListToStdVector();
     void fillMediaListByVector(std::vector<std::pair<int,Media*>>& mediaVec);
     void fillUserListByVector(std::vector<std::pair<int,User*>> userVec);
-    bool compareMediaByCreator(Media* m1, Media* m2);
+    void sortMediaListByKey();
+    void sortUserListByKey();
 
 public:
     Administration() {};
@@ -35,11 +36,10 @@ public:
     QMap<int,Media*>& getMediaList();
     void sortMediaListByType();
     void sortMediaListByTitle();
-    void sortMediaListByCreator();
     User* getUser(int userId);
-    void getUserList();
-    void sortUserBySurname();
-    void sortUserByName();
+    QMap<int,User*>& getUserList();
+    void sortUserListBySurname();
+    void sortUserListByName();
     int getMediaCount();
     int getUserCount();
     bool lendMedia(int mediaId, int userId);
