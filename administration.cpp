@@ -95,7 +95,7 @@ vector<pair<int,Media*>> Administration::mediaListToStdVector() {
 }
 
 void Administration::fillMediaListByVector(std::vector<std::pair<int,Media*>>& mediaVec) {
-    mediaList.clear();
+    clearMedia();
 
     for (const auto& pair : mediaVec) {
         mediaList.insert(pair.first, pair.second);
@@ -118,7 +118,7 @@ void Administration::sortMediaListByTitle() {
 
     sort(mediaVec.begin(), mediaVec.end(),
          [](const pair<int,Media*>& m1, const pair<int,Media*>& m2) {
-        return QString::compare(m1.second->getTitle(), m2.second->getTitle()) <= 0 ? true : false;
+        return QString::compare(m1.second->getTitle(), m2.second->getTitle()) > 0 ? true : false;
     });
 
     fillMediaListByVector(mediaVec);

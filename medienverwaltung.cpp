@@ -537,7 +537,7 @@ void Medienverwaltung::cB_mediaType_SelectionChanged() {
     QComboBox* cB_type = qobject_cast<QComboBox*>(sender());
     QString cBName = cB_type->objectName();
     MediaType type = (MediaType)cB_type->currentIndex();
-    int cBRow = cBName.split('_').last().toInt(); // "cB_mediaType_rowIndex"
+    int cBRow = cBName.mid(cBName.indexOf('_') + 1).toInt(); // "cB_media_rowIndex"
     QTableWidgetItem* idItem = ui->db_media->item(cBRow, 0);
     int mediaId = idItem->data(Qt::UserRole).toInt();
     admin->updateMediaType(mediaId, type);
