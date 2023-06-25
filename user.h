@@ -10,15 +10,21 @@ class User
 private:
     QString name;
     QString surname;
+    QString email;
+    QDate birthdate;
     QList<int> lentMedia;
 
 public:
-    User(QString name, QString surname);
+    User(QString name, QString surname, QString email, QDate birthdate);
     QString getName();
     QString getSurname();
+    QString getEmail();
+    QDate getBirthdate();
     QList<int>& getLentMedia();
     void setName(QString name);
     void setSurname(QString surname);
+    void setEmail(QString email);
+    void setBirthdate(QDate birthdate);
     bool lendMediaByUser(int mediaId);
     bool handBackMediaByUser(int mediaId);
 };

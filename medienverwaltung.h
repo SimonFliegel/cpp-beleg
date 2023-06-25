@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTableWidget>
+#include <QDateEdit>
 #include "administration.h"
 
 QT_BEGIN_NAMESPACE
@@ -26,10 +27,9 @@ private:
     void initUserTable();
     void initGBAddMedia();
     void initGBSearch();
-    void initShortcuts();
+    void initDEBirthdate(QDateEdit* de);
 
-    void saveData();
-    void loadData();
+    bool isValidEmail(QString email);
 
     void fillMediaTable(QMap<int,Media*> mediaData);
     void fillUserTable(QMap<int,User*> userData);
@@ -46,6 +46,7 @@ private:
 private slots:
     void actionSave_Triggered();
     void actionLoad_Triggered();
+    void actionDelete_Triggered();
     void btn_addMedia_Clicked();
     void btn_registerUser_Clicked();
     void btn_deleteMedia_Clicked();
@@ -60,7 +61,9 @@ private slots:
     void db_media_ItemChanged(QTableWidgetItem* item);
     void db_user_ItemChanged(QTableWidgetItem* item);
     void cB_mediaType_SelectionChanged();
+    void dE_birthdate_DateChanged();
     void cB_returnMedia_user_SelectionChanged();
+    void li_lentMedia_SelectionChanged();
     void db_user_SelectionChanged();
     void tab_view_CurrentChanged(int index);
 };

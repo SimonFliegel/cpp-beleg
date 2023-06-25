@@ -23,6 +23,7 @@ private:
     QMap<int,Media*> searchMediaByCreator(QString creator);
     QMap<int,User*> searchUsersBySurname(QString surname);
     QMap<int,User*> searchUsersByName(QString name);
+    QMap<int,User*> searchUsersByEmail(QString email);
 
 public:
     Administration() {};
@@ -38,7 +39,7 @@ public:
     int getMediaCount();
     int getUserCount();
     QMap<int,Media*> searchMedia(MediaType type, QString title = "", QString creator = "");
-    QMap<int,User*> searchUsers(QString surname = "", QString name = "");
+    QMap<int,User*> searchUsers(QString surname = "", QString name = "", QString email = "");
     bool lendMedia(int mediaId, int userId);
     bool returnMedia(int mediaId, int userId);
     bool saveUsers();

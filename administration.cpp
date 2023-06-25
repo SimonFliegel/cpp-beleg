@@ -38,9 +38,6 @@ void Administration::updateMediaType(int mediaId, MediaType newType) {
     case DVD:
         updatedMedia = new Dvd(oldMedia->getTitle());
         break;
-    default:
-        updatedMedia = oldMedia;
-        break;
     }
 
     delete oldMedia;
@@ -187,6 +184,22 @@ QMap<int,User*> Administration::searchUsersByName(QString name) {
     return results;
 }
 
+QMap<int,User*> Administration::searchUsersByEmail(QString email) {
+    QMap<int,User*> results;
+    QMap<int,User*>::const_iterator it;
+    QString searchString = email.remove(' ').toLower();
+    QString resultString;
+
+    for (it = userList.constBegin(); it != userList.constEnd(); ++it) {
+        resultString = it.value()->getEmail().remove(' ').toLower();
+        if (resultString.contains(searchString)) {
+            results.insert(it.key(), it.value());
+        }
+    }
+
+    return results;
+}
+
 /*********************** public *******************************/
 
 QMap<int,Media*> Administration::searchMedia(MediaType type, QString title, QString creator) {
@@ -196,11 +209,11 @@ QMap<int,Media*> Administration::searchMedia(MediaType type, QString title, QStr
     QMap<int,Media*> titleResults = mediaList;
     QMap<int,Media*> creatorResults = mediaList;
 
-    if (title.length() > 0) {
+    if (!title.isEmpty()) {
         titleResults = searchMediaByTitle(title);
     }
 
-    if (creator.length() > 0) {
+    if (!creator.isEmpty()) {
         creatorResults = searchMediaByCreator(creator);
     }
 
@@ -215,22 +228,27 @@ QMap<int,Media*> Administration::searchMedia(MediaType type, QString title, QStr
     return results;
 }
 
-QMap<int,User*> Administration::searchUsers(QString surname, QString name) {
+QMap<int,User*> Administration::searchUsers(QString surname, QString name, QString email) {
     QMap<int,User*> results;
     QMap<int,User*>::const_iterator it;
     QMap<int,User*> surnameResults = userList;
     QMap<int,User*> nameResults = userList;
+    QMap<int,User*> emailResults = userList;
 
-    if (surname.length() > 0) {
+    if (!surname.isEmpty()) {
         surnameResults = searchUsersBySurname(surname);
     }
 
-    if (name.length() > 0) {
+    if (!name.isEmpty()) {
         nameResults = searchUsersByName(name);
     }
 
+    if (!email.isEmpty()) {
+        emailResults = searchUsersByEmail(email);
+    }
+
     for (it = userList.constBegin(); it != userList.constEnd(); ++it) {
-        if (surnameResults.contains(it.key()) && nameResults.contains(it.key())) {
+        if (surnameResults.contains(it.key()) && nameResults.contains(it.key()) && emailResults.contains(it.key())) {
             results.insert(it.key(), it.value());
         }
     }
@@ -287,8 +305,9 @@ bool Administration::saveUsers() {
             }
         }
 
-        // id,name,surname,lentMediaIds/-1
-        stream << it_userList.key() << "," << user->getName() << "," << user->getSurname() << "," << lentMediaString << Qt::endl;
+        // id,name,surname,email,birthdate,lentMediaIds/-1
+        stream << it_userList.key() << "," << user->getName() << "," << user->getSurname() << "," << user->getEmail()
+               << "," << user->getBirthdate().toString("dd.MM.yyyy") << "," << lentMediaString << Qt::endl;
     }
     file.close();
     return true;
@@ -323,9 +342,6 @@ bool Administration::saveMedia() {
             creator = static_cast<Dvd*>(media)->getDirector();
             stream << (creator.length() > 0 ? creator : "-1");
             break;
-        default: // CUSTOM
-            stream << QString::number(-1);
-            break;
         }
         stream << Qt::endl;
     }
@@ -337,7 +353,8 @@ bool Administration::loadUsers() {
     User* user;
     int mediaId;
     int userId;
-    QString name, surname;
+    QString name, surname, email;
+    QDate birthdate;
     QFile file(userFilePath);
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -354,8 +371,12 @@ bool Administration::loadUsers() {
         userId = values[0].toInt();
         name = values[1];
         surname = values[2];
-        user = new User(name, surname);
-        QStringList lentMediaIds = values[3].split(" ");
+        email = values[3];
+        birthdate = QDate::fromString(values[4], "dd.MM.yyyy");
+
+        user = new User(name, surname, email, birthdate);
+
+        QStringList lentMediaIds = values[5].split(" ");
         for (const QString& str : lentMediaIds) {
             if (str.length() > 0) {
                 mediaId = str.toInt();
