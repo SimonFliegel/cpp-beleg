@@ -1,8 +1,8 @@
 #ifndef MEDIATYPES_H
 #define MEDIATYPES_H
 
-enum MediaType { BOOK, CD, DVD, CUSTOM };
+enum MediaType { BOOK, CD, DVD };
 
-extern const char* typeNames[4];
+extern const char* typeNames[3];
 
 #endif // MEDIATYPES_H

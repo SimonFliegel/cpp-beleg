@@ -18,12 +18,11 @@ private:
     int nextMediaId = 0;
     int returnAllMediaByUser(int userId);
     int getItemCountFromFile(QString path);
-    std::vector<std::pair<int,Media*>> mediaListToStdVector();
-    std::vector<std::pair<int,User*>> userListToStdVector();
-    void fillMediaListByVector(std::vector<std::pair<int,Media*>>& mediaVec);
-    void fillUserListByVector(std::vector<std::pair<int,User*>> userVec);
-    void sortMediaListByKey();
-    void sortUserListByKey();
+    QMap<int,Media*> searchMediaByType(MediaType type);
+    QMap<int,Media*> searchMediaByTitle(QString title);
+    QMap<int,Media*> searchMediaByCreator(QString creator);
+    QMap<int,User*> searchUsersBySurname(QString surname);
+    QMap<int,User*> searchUsersByName(QString name);
 
 public:
     Administration() {};
@@ -34,14 +33,12 @@ public:
     bool deleteMedia(int mediaId);
     Media* getMedia(int mediaId);
     QMap<int,Media*>& getMediaList();
-    void sortMediaListByType();
-    void sortMediaListByTitle();
     User* getUser(int userId);
     QMap<int,User*>& getUserList();
-    void sortUserListBySurname();
-    void sortUserListByName();
     int getMediaCount();
     int getUserCount();
+    QMap<int,Media*> searchMedia(MediaType type, QString title = "", QString creator = "");
+    QMap<int,User*> searchUsers(QString surname = "", QString name = "");
     bool lendMedia(int mediaId, int userId);
     bool returnMedia(int mediaId, int userId);
     bool saveUsers();

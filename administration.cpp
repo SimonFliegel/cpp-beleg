@@ -83,57 +83,8 @@ QMap<int,Media*>& Administration::getMediaList() {
     return mediaList;
 }
 
-vector<pair<int,Media*>> Administration::mediaListToStdVector() {
-    vector<pair<int,Media*>> stdVec;
-    QMap<int,Media*>::const_iterator it;
-
-    for (it = mediaList.constBegin(); it != mediaList.constEnd(); ++it) {
-        stdVec.push_back(make_pair(it.key(), it.value()));
-    }
-
-    return stdVec;
-}
-
-void Administration::fillMediaListByVector(std::vector<std::pair<int,Media*>>& mediaVec) {
-    clearMedia();
-
-    for (const auto& pair : mediaVec) {
-        mediaList.insert(pair.first, pair.second);
-    }
-}
-
-void Administration::sortMediaListByType() {
-    auto mediaVec = mediaListToStdVector();
-
-    sort(mediaVec.begin(), mediaVec.end(),
-              [](const pair<int,Media*>& m1, const pair<int,Media*>& m2) {
-        return m1.second->getType() <= m2.second->getType();
-    });
-
-    fillMediaListByVector(mediaVec);
-}
-
-void Administration::sortMediaListByTitle() {
-    auto mediaVec = mediaListToStdVector();
-
-    sort(mediaVec.begin(), mediaVec.end(),
-         [](const pair<int,Media*>& m1, const pair<int,Media*>& m2) {
-        return QString::compare(m1.second->getTitle(), m2.second->getTitle()) > 0 ? true : false;
-    });
-
-    fillMediaListByVector(mediaVec);
-}
-
 QMap<int,User*>& Administration::getUserList() {
     return userList;
-}
-
-void Administration::sortUserListBySurname() {
-    return;
-}
-
-void Administration::sortUserListByName() {
-    return;
 }
 
 int Administration::getMediaCount() {
@@ -144,6 +95,148 @@ int Administration::getUserCount() {
     return userList.count();
 }
 
+/********************** private ******************************/
+
+QMap<int,Media*> Administration::searchMediaByType(MediaType type) {
+    QMap<int,Media*> results;
+    QMap<int,Media*>::const_iterator it;
+
+    for (it = mediaList.constBegin(); it != mediaList.constEnd(); ++it) {
+        if (it.value()->getType() == type) {
+            results.insert(it.key(), it.value());
+        }
+    }
+
+    return results;
+}
+
+QMap<int,Media*> Administration::searchMediaByTitle(QString title) {
+    QMap<int,Media*> results;
+    QMap<int,Media*>::const_iterator it;
+    QString searchString = title.remove(' ').toLower();
+    QString resultString;
+
+    for (it = mediaList.constBegin(); it != mediaList.constEnd(); ++it) {
+        resultString = it.value()->getTitle().remove(' ').toLower();
+        if (resultString.contains(searchString)) {
+            results.insert(it.key(), it.value());
+        }
+    }
+
+    return results;
+}
+
+QMap<int,Media*> Administration::searchMediaByCreator(QString creator) {
+    QMap<int,Media*> results;
+    QMap<int,Media*>::const_iterator it;
+    QString searchString = creator.remove(' ').toLower();
+    QString resultString;
+
+    for (it = mediaList.constBegin(); it != mediaList.constEnd(); ++it) {
+        MediaType type = it.value()->getType();
+        switch (type) {
+        case BOOK:
+            resultString = static_cast<Book*>(it.value())->getAuthor();
+            break;
+        case CD:
+            resultString = static_cast<Cd*>(it.value())->getInterpret();
+            break;
+        case DVD:
+            resultString = static_cast<Dvd*>(it.value())->getDirector();
+        }
+
+        resultString = resultString.remove(' ').toLower();
+
+        if (resultString.contains(searchString)) {
+            results.insert(it.key(), it.value());
+        }
+    }
+
+    return results;
+}
+
+QMap<int,User*> Administration::searchUsersBySurname(QString surname) {
+    QMap<int,User*> results;
+    QMap<int,User*>::const_iterator it;
+    QString searchString = surname.remove(' ').toLower();
+    QString resultString;
+
+    for (it = userList.constBegin(); it != userList.constEnd(); ++it) {
+        resultString = it.value()->getSurname().remove(' ').toLower();
+        if (resultString.contains(searchString)) {
+            results.insert(it.key(), it.value());
+        }
+    }
+
+    return results;
+}
+
+QMap<int,User*> Administration::searchUsersByName(QString name) {
+    QMap<int,User*> results;
+    QMap<int,User*>::const_iterator it;
+    QString searchString = name.remove(' ').toLower();
+    QString resultString;
+
+    for (it = userList.constBegin(); it != userList.constEnd(); ++it) {
+        resultString = it.value()->getName().remove(' ').toLower();
+        if (resultString.contains(searchString)) {
+            results.insert(it.key(), it.value());
+        }
+    }
+
+    return results;
+}
+
+/*********************** public *******************************/
+
+QMap<int,Media*> Administration::searchMedia(MediaType type, QString title, QString creator) {
+    QMap<int,Media*> results;
+    QMap<int,Media*>::const_iterator it;
+    QMap<int,Media*> typeResults;
+    QMap<int,Media*> titleResults = mediaList;
+    QMap<int,Media*> creatorResults = mediaList;
+
+    if (title.length() > 0) {
+        titleResults = searchMediaByTitle(title);
+    }
+
+    if (creator.length() > 0) {
+        creatorResults = searchMediaByCreator(creator);
+    }
+
+    typeResults = searchMediaByType(type);
+
+    for (it = typeResults.constBegin(); it != typeResults.constEnd(); ++it) {
+        if (titleResults.contains(it.key()) && creatorResults.contains(it.key())) {
+            results.insert(it.key(), it.value());
+        }
+    }
+
+    return results;
+}
+
+QMap<int,User*> Administration::searchUsers(QString surname, QString name) {
+    QMap<int,User*> results;
+    QMap<int,User*>::const_iterator it;
+    QMap<int,User*> surnameResults = userList;
+    QMap<int,User*> nameResults = userList;
+
+    if (surname.length() > 0) {
+        surnameResults = searchUsersBySurname(surname);
+    }
+
+    if (name.length() > 0) {
+        nameResults = searchUsersByName(name);
+    }
+
+    for (it = userList.constBegin(); it != userList.constEnd(); ++it) {
+        if (surnameResults.contains(it.key()) && nameResults.contains(it.key())) {
+            results.insert(it.key(), it.value());
+        }
+    }
+
+    return results;
+}
 
 bool Administration::lendMedia(int mediaId, int userId) {
     if (mediaList.contains(mediaId) && userList.contains(userId)) {
@@ -299,7 +392,7 @@ bool Administration::loadMedia() {
         title = values[1];
         userId = values[2].toInt();
         type = (MediaType)values[3].toInt();
-        creator = values[4];
+        creator = (values[4] == "-1" ? "" : values[4]);
         Media* media;
 
         switch (type) {
@@ -311,11 +404,9 @@ bool Administration::loadMedia() {
             break;
         case DVD:
             media = new Dvd(title, creator);
-            break;
-        default: //CUSTOM
-            media = new Media(title);
-            break;
+            break;   
         }
+
         media->setUserId(userId);
         mediaList.insert(mediaId, media);
         nextMediaId = mediaId + 1;

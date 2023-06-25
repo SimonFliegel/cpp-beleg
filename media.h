@@ -9,9 +9,9 @@ class Media
 private:
     QString title;
     int userId;
-    MediaType type = CUSTOM;
+    MediaType type;
 public:
-    Media(QString title, MediaType type = CUSTOM);
+    Media(QString title, MediaType type = BOOK);
     QString getTitle();
     MediaType getType();
     int getUserId();

@@ -1,3 +1,3 @@
 #include "mediaTypes.h"
 
-const char* typeNames[4] = {"Buch", "CD", "DVD", "Benutzerdefiniert"};
+const char* typeNames[3] = {"Buch", "CD", "DVD",};

@@ -24,7 +24,9 @@ private:
     void initUi();
     void initMediaTable();
     void initUserTable();
-    void initGBaddMedia();
+    void initGBAddMedia();
+    void initGBSearch();
+    void initShortcuts();
 
     void saveData();
     void loadData();
@@ -51,8 +53,10 @@ private slots:
     void btn_lendMedia_Clicked();
     void btn_returnMedia_Clicked();
     void btn_returnMedia_user_Clicked();
-    void db_media_columnHeader_Clicked(int colIndex);
-    void db_user_columnHeader_Clicked(int colIndex);
+    void btn_searchMedia_Clicked();
+    void btn_searchUser_Clicked();
+    void btn_resetSearchMedia_Clicked();
+    void btn_resetSearchUser_Clicked();
     void db_media_ItemChanged(QTableWidgetItem* item);
     void db_user_ItemChanged(QTableWidgetItem* item);
     void cB_mediaType_SelectionChanged();

@@ -7,6 +7,7 @@
 #include <QListWidget>
 #include <QComboBox>
 #include <QMessageBox>
+#include <QShortcut>
 
 #include "mediaTypes.h"
 #include "book.h"
@@ -29,8 +30,9 @@ Medienverwaltung::~Medienverwaltung()
 void Medienverwaltung::initUi() {
     initMediaTable();
     initUserTable();
-    initGBaddMedia();
-    ui->tab_view->setCurrentIndex(0);
+    initGBAddMedia();
+    initGBSearch();
+    initShortcuts();
 
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(actionSave_Triggered()));
     connect(ui->actionLoad, SIGNAL(triggered()), this, SLOT(actionLoad_Triggered()));
@@ -39,7 +41,10 @@ void Medienverwaltung::initUi() {
     connect(ui->btn_lendMedia, SIGNAL(released()), this, SLOT(btn_lendMedia_Clicked()));
     connect(ui->btn_returnMedia, SIGNAL(released()), this, SLOT(btn_returnMedia_Clicked()));
     connect(ui->btn_returnMedia_user, SIGNAL(released()), this, SLOT(btn_returnMedia_user_Clicked()));
-    connect(ui->db_media->horizontalHeader(), &QHeaderView::sectionClicked, this, &Medienverwaltung::db_media_columnHeader_Clicked);
+    connect(ui->btn_searchMedia, SIGNAL(released()), this, SLOT(btn_searchMedia_Clicked()));
+    connect(ui->btn_searchUser, SIGNAL(released()), this, SLOT(btn_searchUser_Clicked()));
+    connect(ui->btn_resetSearchUser, SIGNAL(released()), this, SLOT(btn_resetSearchUser_Clicked()));
+    connect(ui->btn_resetSearchMedia, SIGNAL(released()), this, SLOT(btn_resetSearchMedia_Clicked()));
     connect(ui->db_media, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(db_media_ItemChanged(QTableWidgetItem*)));
     connect(ui->db_user, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(db_user_ItemChanged(QTableWidgetItem*)));
     connect(ui->cB_returnMedia_user, SIGNAL(currentIndexChanged(int)), this, SLOT(cB_returnMedia_user_SelectionChanged()));
@@ -51,15 +56,16 @@ void Medienverwaltung::initMediaTable()
 {
     QTableWidget* table = ui->db_media;
     QStringList headers;
-    headers << "ID" << "Typ" << "Titel" << "Vorname" << "Nachname" << "Löschen";
-    table->setColumnCount(6); // type, title, user-surname, user-name
+    headers << "ID" << "Typ" << "Titel" << "Creator" << "Vorname" << "Nachname" << "Löschen";
+    table->setColumnCount(7); // type, title, creator, user-surname, user-name, delete-button
     table->setHorizontalHeaderLabels(headers);
     table->setColumnHidden(0, true); // id column
-    table->setColumnWidth(1, 100);
-    table->setColumnWidth(2, 300);
-    table->setColumnWidth(3, 175);
+    table->setColumnWidth(1, 60);
+    table->setColumnWidth(2, 250);
+    table->setColumnWidth(3, 200);
     table->setColumnWidth(4, 175);
-    table->setColumnWidth(5, 50);
+    table->setColumnWidth(5, 175);
+    table->setColumnWidth(6, 50);
     table->verticalHeader()->setVisible(false);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -68,23 +74,41 @@ void Medienverwaltung::initMediaTable()
 void Medienverwaltung::initUserTable() {
     QTableWidget* table = ui->db_user;
     QStringList headers;
-    headers << "ID" << "Vorname" << "Nachname";
+    headers << "ID" << "Vorname" << "Nachname" << "Löschen";
     table->setColumnCount(4);
     table->setHorizontalHeaderLabels(headers);
     table->setColumnHidden(0, true); // id column
-    table->setColumnWidth(1, 375);
-    table->setColumnWidth(2, 375);
+    table->setColumnWidth(1, 370);
+    table->setColumnWidth(2, 370);
     table->setColumnWidth(3, 50);
     table->verticalHeader()->setVisible(false);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::SingleSelection);
 }
 
-void Medienverwaltung::initGBaddMedia() {
+void Medienverwaltung::initGBAddMedia() {
     QStringList items;
     items << "Buch" << "CD" << "DVD";
     ui->cB_addMedia_type->addItems(items);
     ui->cB_addMedia_type->setCurrentIndex(0);
+}
+
+void Medienverwaltung::initGBSearch() {
+    ui->tab_view->setCurrentIndex(0);
+    QStringList items;
+    items << "Buch" << "CD" << "DVD";
+    ui->cB_searchMedia_type->addItems(items);
+    ui->btn_resetSearchMedia->setEnabled(false);
+    ui->btn_resetSearchUser->setEnabled(false);
+}
+
+void Medienverwaltung::initShortcuts() {
+    ui->actionSave->setShortcut(Qt::CTRL | Qt::Key_S);
+    ui->actionLoad->setShortcut(Qt::CTRL | Qt::Key_L);
+    QShortcut* save = new QShortcut(Qt::CTRL | Qt::Key_S, ui->actionSave);
+    QShortcut* load = new QShortcut(Qt::CTRL | Qt::Key_L, ui->actionLoad);
+    connect(save, SIGNAL(activated()), this, SLOT(actionSave_Triggered()));
+    connect(load, SIGNAL(activated()), this, SLOT(actionLoad_Triggered()));
 }
 
 void Medienverwaltung::saveData() {
@@ -137,7 +161,7 @@ void Medienverwaltung::fillMediaTable(QMap<int,Media*> mediaData) {
     QComboBox* cB_type;
     QPushButton* btn_delete;
     QIcon icon(":/img/deleteItem.png");
-    QTableWidgetItem *id, *title, *surname, *name;
+    QTableWidgetItem *id, *title, *creator, *surname, *name;
     QStringList cB_items;
 
     cB_items << "Buch" << "CD" << "DVD";
@@ -159,6 +183,19 @@ void Medienverwaltung::fillMediaTable(QMap<int,Media*> mediaData) {
         connect(cB_type, SIGNAL(currentIndexChanged(int)), this, SLOT(cB_mediaType_SelectionChanged()));
 
         title = new QTableWidgetItem(it.value()->getTitle());
+        creator = new QTableWidgetItem();
+
+        switch(it.value()->getType()) {
+        case BOOK:
+            creator->setText(static_cast<Book*>(it.value())->getAuthor());
+            break;
+        case CD:
+            creator->setText(static_cast<Cd*>(it.value())->getInterpret());
+            break;
+        case DVD:
+            creator->setText(static_cast<Dvd*>(it.value())->getDirector());
+            break;
+        }
 
         if (it.value()->getUserId() != -1) { // if media is lent...
             user = admin->getUser(it.value()->getUserId());
@@ -181,9 +218,10 @@ void Medienverwaltung::fillMediaTable(QMap<int,Media*> mediaData) {
         table->setItem(rowCount, 0, id); // hidden
         table->setCellWidget(rowCount, 1, cB_type);
         table->setItem(rowCount, 2, title);
-        table->setItem(rowCount, 3, surname);
-        table->setItem(rowCount, 4, name);
-        table->setCellWidget(rowCount, 5, btn_delete);
+        table->setItem(rowCount, 3, creator);
+        table->setItem(rowCount, 4, surname);
+        table->setItem(rowCount, 5, name);
+        table->setCellWidget(rowCount, 6, btn_delete);
         table->blockSignals(false);
 
         rowCount++;
@@ -387,7 +425,7 @@ void Medienverwaltung::btn_deleteMedia_Clicked() {
     QTableWidgetItem* idItem;
     int mediaId;
 
-    btnRow = btnName.mid(btnName.lastIndexOf('_') + 1).toInt(); // Buttons have object names "btn_deleteMedia_rowIndex"
+    btnRow = btnName.split('_').last().toInt(); // Buttons have object names "btn_deleteMedia_rowIndex"
     idItem = ui->db_media->item(btnRow, 0);
     mediaId = idItem->data(Qt::UserRole).toInt();
     if (admin->deleteMedia(mediaId)) {
@@ -408,7 +446,7 @@ void Medienverwaltung::btn_deleteUser_Clicked() {
     int userId;
     User* user;
 
-    btnRow = btnName.mid(btnName.lastIndexOf('_') + 1).toInt(); // Buttons have object names "btn_deleteUser[RowIndex]"
+    btnRow = btnName.split('_').last().toInt(); // Buttons have object names "btn_deleteUser[RowIndex]"
     idItem = ui->db_media->item(btnRow, 0);
     userId = idItem->data(Qt::UserRole).toInt();
     if (admin->deleteUser(userId)) {
@@ -458,34 +496,35 @@ void Medienverwaltung::btn_returnMedia_user_Clicked() {
     updateLentMediaList();
 }
 
-void Medienverwaltung::db_media_columnHeader_Clicked(int colIndex) {
-    switch (colIndex) {
-    case 1: // type
-        admin->sortMediaListByType();
-        break;
-    case 2: // title
-        admin->sortMediaListByTitle();
-        break;
-    case 4: // surname
-        break;
-    case 5: // name
-        break;
-    }
-
-    fillMediaTable(admin->getMediaList());
+void Medienverwaltung::btn_searchMedia_Clicked() {
+    MediaType type = (MediaType)ui->cB_searchMedia_type->currentIndex();
+    QString title = ui->lE_searchMedia_title->text();
+    QString creator = ui->lE_searchMedia_creator->text();
+    fillMediaTable(admin->searchMedia(type, title, creator));
+    ui->btn_resetSearchMedia->setEnabled(true);
 }
 
-void Medienverwaltung::db_user_columnHeader_Clicked(int colIndex) {
-    QMap<int,User*> sortedUsers;
+void Medienverwaltung::btn_searchUser_Clicked() {
+    QString surname = ui->lE_searchUser_surname->text();
+    QString name = ui->lE_searchUser_name->text();
+    if (surname.isEmpty() && name.isEmpty()) return;
+    fillUserTable(admin->searchUsers(surname, name));
+    ui->btn_resetSearchUser->setEnabled(true);
+}
 
-    switch (colIndex) {
-    case 1: // surname
-        break;
-    case 2: // name
-        break;
-    }
+void Medienverwaltung::btn_resetSearchMedia_Clicked() {
+    ui->cB_searchMedia_type->setCurrentIndex(0);
+    ui->lE_searchMedia_title->clear();
+    ui->lE_searchMedia_creator->clear();
+    fillMediaTable(admin->getMediaList());
+    ui->btn_resetSearchMedia->setEnabled(false);
+}
 
-    fillUserTable(sortedUsers);
+void Medienverwaltung::btn_resetSearchUser_Clicked() {
+    ui->lE_searchUser_surname->clear();
+    ui->lE_searchUser_name->clear();
+    fillUserTable(admin->getUserList());
+    ui->btn_resetSearchUser->setEnabled(false);
 }
 
 void Medienverwaltung::db_media_ItemChanged(QTableWidgetItem* item) {
@@ -537,7 +576,7 @@ void Medienverwaltung::cB_mediaType_SelectionChanged() {
     QComboBox* cB_type = qobject_cast<QComboBox*>(sender());
     QString cBName = cB_type->objectName();
     MediaType type = (MediaType)cB_type->currentIndex();
-    int cBRow = cBName.mid(cBName.indexOf('_') + 1).toInt(); // "cB_media_rowIndex"
+    int cBRow = cBName.split('_').last().toInt(); // "cB_media_rowIndex"
     QTableWidgetItem* idItem = ui->db_media->item(cBRow, 0);
     int mediaId = idItem->data(Qt::UserRole).toInt();
     admin->updateMediaType(mediaId, type);

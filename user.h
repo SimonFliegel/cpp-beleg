@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QList>
+#include <QDate>
 
 class User
 {
