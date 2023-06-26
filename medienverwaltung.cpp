@@ -14,6 +14,8 @@
 #include "cd.h"
 #include "dvd.h"
 
+bool isChanged = false;
+
 Medienverwaltung::Medienverwaltung(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Medienverwaltung)
@@ -59,7 +61,7 @@ void Medienverwaltung::initMediaTable()
 {
     QTableWidget* table = ui->db_media;
     QStringList headers;
-    headers << "ID" << "Typ" << "Titel" << "Creator" << "Vorname" << "Nachname" << "Löschen";
+    headers << "ID" << "Typ" << "Titel" << "Autor/Interpret/Regisseur" << "Vorname" << "Nachname" << "Löschen";
     table->setColumnCount(7); // type, title, creator, user-surname, user-name, delete-button
     table->setHorizontalHeaderLabels(headers);
     table->setColumnHidden(0, true); // id column
@@ -435,6 +437,7 @@ void Medienverwaltung::btn_addMedia_Clicked() {
 
     admin->addMedia(newMedia);
     updateMediaUI();
+    isChanged = true;
 }
 
 void Medienverwaltung::btn_registerUser_Clicked() {
@@ -461,6 +464,7 @@ void Medienverwaltung::btn_registerUser_Clicked() {
     ui->lE_registerUser_name->clear();
     ui->lE_registerUser_email->clear();
     ui->dE_registerUser_birthdate->setDate(ui->dE_registerUser_birthdate->minimumDate());
+    isChanged = true;
 }
 
 void Medienverwaltung::btn_deleteMedia_Clicked() {
@@ -480,7 +484,7 @@ void Medienverwaltung::btn_deleteMedia_Clicked() {
                                                   + buildMediaItemString(admin->getMedia(mediaId))
                                                   + "<br>ist ein Fehler aufgetreten");
     }
-
+    isChanged = true;
 }
 
 void Medienverwaltung::btn_deleteUser_Clicked() {
@@ -502,7 +506,7 @@ void Medienverwaltung::btn_deleteUser_Clicked() {
                                                   + user->getSurname() + " " + user->getName()
                                                   + "<br>ist ein Fehler aufgetreten");
     }
-
+    isChanged = true;
 }
 
 void Medienverwaltung::btn_lendMedia_Clicked() {
@@ -511,6 +515,7 @@ void Medienverwaltung::btn_lendMedia_Clicked() {
     admin->lendMedia(mediaId, userId);
     updateMediaUI();
     updateUserTable(); // update delete-button-status
+    isChanged = true;
 }
 
 void Medienverwaltung::btn_returnMedia_Clicked() {
@@ -521,6 +526,7 @@ void Medienverwaltung::btn_returnMedia_Clicked() {
     }
     updateMediaUI();
     updateUserTable();
+    isChanged = true;
 }
 
 void Medienverwaltung::btn_returnMedia_user_Clicked() {
@@ -539,6 +545,7 @@ void Medienverwaltung::btn_returnMedia_user_Clicked() {
     updateMediaUI();
     updateUserTable();
     updateLentMediaList();
+    isChanged = true;
 }
 
 void Medienverwaltung::btn_searchMedia_Clicked() {
@@ -596,6 +603,7 @@ void Medienverwaltung::db_media_ItemChanged(QTableWidgetItem* item) {
         }
     }
     updateMediaUI();
+    isChanged = true;
 }
 
 void Medienverwaltung::db_user_ItemChanged(QTableWidgetItem* item) {
@@ -621,6 +629,7 @@ void Medienverwaltung::db_user_ItemChanged(QTableWidgetItem* item) {
         }
     }
     updateUserUI();
+    isChanged = true;
 }
 
 void Medienverwaltung::cB_mediaType_SelectionChanged() {
@@ -632,6 +641,7 @@ void Medienverwaltung::cB_mediaType_SelectionChanged() {
     int mediaId = idItem->data(Qt::UserRole).toInt();
     admin->updateMediaType(mediaId, type);
     updateMediaUI();
+    isChanged = true;
 }
 
 void Medienverwaltung::dE_birthdate_DateChanged() {
@@ -644,6 +654,7 @@ void Medienverwaltung::dE_birthdate_DateChanged() {
     User* user = admin->getUser(userId);
     user->setBirthdate(birthdate);
     updateUserUI();
+    isChanged = true;
 }
 
 void Medienverwaltung::cB_returnMedia_user_SelectionChanged() {
@@ -671,6 +682,16 @@ void Medienverwaltung::tab_view_CurrentChanged(int index) {
         ui->db_user->clearSelection();
         ui->li_lentMedia->clear();
     }
+}
+
+void Medienverwaltung::app_aboutToQuit() {
+    if (isChanged) {
+        int response = QMessageBox::question(this, "Speichern", "Sollen die Änderungen gespeichert werden?");
+        if (response == QMessageBox::Yes) {
+            actionSave_Triggered();
+        }
+    }
+
 }
 
 

@@ -18,7 +18,7 @@
     <item row="1" column="0">
      <widget class="QTabWidget" name="tab_view">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_media">
        <attribute name="title">
@@ -73,6 +73,9 @@
            <width>81</width>
            <height>25</height>
           </rect>
+         </property>
+         <property name="currentIndex">
+          <number>-1</number>
          </property>
         </widget>
         <widget class="QLineEdit" name="lE_addMedia_title">
@@ -354,7 +357,7 @@
         <property name="title">
          <string>Nutzer registrieren</string>
         </property>
-        <widget class="QLineEdit" name="lE_registerUser_surname">
+        <widget class="QLineEdit" name="lE_registerUser_name">
          <property name="geometry">
           <rect>
            <x>140</x>
@@ -367,7 +370,7 @@
           <string/>
          </property>
         </widget>
-        <widget class="QLabel" name="lbl_surname">
+        <widget class="QLabel" name="lbl_name">
          <property name="geometry">
           <rect>
            <x>20</x>
@@ -380,7 +383,7 @@
           <string>Vorname:</string>
          </property>
         </widget>
-        <widget class="QLabel" name="lbl_name">
+        <widget class="QLabel" name="lbl_surname">
          <property name="geometry">
           <rect>
            <x>20</x>
@@ -393,7 +396,7 @@
           <string>Nachname:</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lE_registerUser_name">
+        <widget class="QLineEdit" name="lE_registerUser_surname">
          <property name="geometry">
           <rect>
            <x>140</x>
@@ -520,7 +523,7 @@
         <property name="title">
          <string>Suche</string>
         </property>
-        <widget class="QLineEdit" name="lE_searchUser_surname">
+        <widget class="QLineEdit" name="lE_searchUser_name">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -533,7 +536,7 @@
           <string>Vorname</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lE_searchUser_name">
+        <widget class="QLineEdit" name="lE_searchUser_surname">
          <property name="geometry">
           <rect>
            <x>210</x>
@@ -614,7 +617,6 @@
    </attribute>
    <addaction name="actionSave"/>
    <addaction name="actionLoad"/>
-   <addaction name="actionDelete"/>
   </widget>
   <action name="actionSave">
    <property name="icon">
@@ -626,7 +628,7 @@
     <string>Save</string>
    </property>
    <property name="toolTip">
-    <string>Save data to files</string>
+    <string>Save data to files (CTRL+S)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -641,7 +643,7 @@
     <string>Load</string>
    </property>
    <property name="toolTip">
-    <string>Load data from files</string>
+    <string>Load data from files (CTRL+L)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
@@ -660,6 +662,38 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>tab_view</tabstop>
+  <tabstop>db_media</tabstop>
+  <tabstop>cB_addMedia_type</tabstop>
+  <tabstop>lE_addMedia_title</tabstop>
+  <tabstop>lE_addMedia_creator</tabstop>
+  <tabstop>btn_addMedia</tabstop>
+  <tabstop>cB_lendMedia_user</tabstop>
+  <tabstop>cB_lendMedia_media</tabstop>
+  <tabstop>btn_lendMedia</tabstop>
+  <tabstop>cB_returnMedia_user</tabstop>
+  <tabstop>cB_returnMedia_media</tabstop>
+  <tabstop>btn_returnMedia</tabstop>
+  <tabstop>cB_searchMedia_type</tabstop>
+  <tabstop>lE_searchMedia_title</tabstop>
+  <tabstop>lE_searchMedia_creator</tabstop>
+  <tabstop>btn_searchMedia</tabstop>
+  <tabstop>btn_resetSearchMedia</tabstop>
+  <tabstop>db_user</tabstop>
+  <tabstop>lE_registerUser_name</tabstop>
+  <tabstop>lE_registerUser_surname</tabstop>
+  <tabstop>lE_registerUser_email</tabstop>
+  <tabstop>dE_registerUser_birthdate</tabstop>
+  <tabstop>btn_registerUser</tabstop>
+  <tabstop>li_lentMedia</tabstop>
+  <tabstop>btn_returnMedia_user</tabstop>
+  <tabstop>lE_searchUser_name</tabstop>
+  <tabstop>lE_searchUser_surname</tabstop>
+  <tabstop>lE_searchUser_email</tabstop>
+  <tabstop>btn_searchUser</tabstop>
+  <tabstop>btn_resetSearchUser</tabstop>
+ </tabstops>
  <resources>
   <include location="resources.qrc"/>
  </resources>

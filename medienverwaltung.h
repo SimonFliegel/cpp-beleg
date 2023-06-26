@@ -66,5 +66,8 @@ private slots:
     void li_lentMedia_SelectionChanged();
     void db_user_SelectionChanged();
     void tab_view_CurrentChanged(int index);
+
+public slots:
+    void app_aboutToQuit();
 };
 #endif // MEDIENVERWALTUNG_H
