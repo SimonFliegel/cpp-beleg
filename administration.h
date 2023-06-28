@@ -1,3 +1,7 @@
+/* Name: Simon Fliegel
+ * Matr. Nr.: 53043
+**************************************************************/
+
 #ifndef USERADMINISTRATION_H
 #define USERADMINISTRATION_H
 

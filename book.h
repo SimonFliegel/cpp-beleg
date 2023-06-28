@@ -1,3 +1,7 @@
+/* Name: Simon Fliegel
+ * Matr. Nr.: 53043
+**************************************************************/
+
 #ifndef BOOK_H
 #define BOOK_H
 

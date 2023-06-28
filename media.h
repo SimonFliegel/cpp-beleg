@@ -1,3 +1,7 @@
+/* Name: Simon Fliegel
+ * Matr. Nr.: 53043
+**************************************************************/
+
 #ifndef MEDIA_H
 #define MEDIA_H
 

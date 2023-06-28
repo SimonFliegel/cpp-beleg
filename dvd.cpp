@@ -1,3 +1,7 @@
+/* Name: Simon Fliegel
+ * Matr. Nr.: 53043
+**************************************************************/
+
 #include "dvd.h"
 
 Dvd::Dvd(QString title) : Media(title, DVD) {}

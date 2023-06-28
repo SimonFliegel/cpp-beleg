@@ -1,3 +1,7 @@
+/* Name: Simon Fliegel
+ * Matr. Nr.: 53043
+**************************************************************/
+
 #include "cd.h"
 
 Cd::Cd(QString title) : Media(title, CD) {}

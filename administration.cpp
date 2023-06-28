@@ -1,3 +1,7 @@
+/* Name: Simon Fliegel
+ * Matr. Nr.: 53043
+**************************************************************/
+
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>

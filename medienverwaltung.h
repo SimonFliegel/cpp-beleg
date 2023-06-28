@@ -1,3 +1,7 @@
+/* Name: Simon Fliegel
+ * Matr. Nr.: 53043
+**************************************************************/
+
 #ifndef MEDIENVERWALTUNG_H
 #define MEDIENVERWALTUNG_H
 

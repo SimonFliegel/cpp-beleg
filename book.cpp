@@ -1,3 +1,7 @@
+/* Name: Simon Fliegel
+ * Matr. Nr.: 53043
+**************************************************************/
+
 #include "book.h"
 
 Book::Book(QString title) : Media(title, BOOK) {}

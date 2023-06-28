@@ -1,3 +1,7 @@
+/* Name: Simon Fliegel
+ * Matr. Nr.: 53043
+**************************************************************/
+
 #include "medienverwaltung.h"
 #include "ui_medienverwaltung.h"
 
@@ -684,6 +688,8 @@ void Medienverwaltung::tab_view_CurrentChanged(int index) {
     }
 }
 
+/************************************* public slots *****************************************/
+
 void Medienverwaltung::app_aboutToQuit() {
     if (isChanged) {
         int response = QMessageBox::question(this, "Speichern", "Sollen die Änderungen gespeichert werden?");
@@ -693,8 +699,3 @@ void Medienverwaltung::app_aboutToQuit() {
     }
 
 }
-
-
-
-
-

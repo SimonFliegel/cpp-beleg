@@ -1,3 +1,6 @@
+# Name: Simon Fliegel
+# Matr. Nr: 53043
+
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
